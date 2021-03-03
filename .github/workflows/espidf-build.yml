@@ -1,10 +1,9 @@
-name: "CodeQL"
+name: "ESP-IDF Build"
 
 on:
   push:
     branches: [ master ]
   pull_request:
-    # The branches below must be a subset of the branches above
     branches: [ master ]
   workflow_dispatch:
 
@@ -13,7 +12,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     
-    container: espressif/idf:latest
+    container: espressif/idf:v4.2
     
     env:
       component-path: display_driver
@@ -28,21 +27,8 @@ jobs:
     - name: Build example
       run: |
         . ${IDF_PATH}/export.sh
-        cd /github/workspace/${{ env.example-path }}
+        cd /github/workspace/display_driver/example
         idf.py build
 
-    
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
-
-
-    # ✏️ If the Autobuild fails above, remove it and uncomment the following three lines
-    #    and modify them (or add more) to build your code if your project
-    #    uses a compiled language
-
-    #- run: |
-    #   make bootstrap
-    #   make release
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+    #- name: Perform CodeQL Analysis
+    #  uses: github/codeql-action/analyze@v1
