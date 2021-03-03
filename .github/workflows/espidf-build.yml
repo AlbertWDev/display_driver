@@ -32,7 +32,7 @@ jobs:
         ls
         . ${IDF_PATH}/export.sh
         echo "IDF/export.sh finished"
-        cd /github/workspace/display_driver/example
+        cd display_driver/example
         echo "Moved to example directory"
         idf.py build
         echo "Build finished"
