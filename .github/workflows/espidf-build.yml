@@ -26,9 +26,16 @@ jobs:
     
     - name: Build example
       run: |
+        echo "Working directory:"
+        pwd
+        echo "Files:"
+        ls
         . ${IDF_PATH}/export.sh
+        echo "IDF/export.sh finished"
         cd /github/workspace/display_driver/example
+        echo "Moved to example directory"
         idf.py build
+        echo "Build finished"
 
     #- name: Perform CodeQL Analysis
     #  uses: github/codeql-action/analyze@v1
