@@ -9,24 +9,28 @@ on:
   workflow_dispatch:
 
 jobs:
-  quality-check:
-    name: CodeQL Analysis
+  build:
+    name: Build
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'cpp' ]
+    
+    container: espressif/idf:latest
+    
+    env:
+      component-path: display_driver
+      example-path: display_driver/example
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-
-    # Initializes the CodeQL tools for scanning.
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
       with:
-        languages: ${{ matrix.language }}
+        path: ${{ env.component-path }}
+    
+    - name: Build example
+      run: |
+        . ${IDF_PATH}/export.sh
+        cd /github/workspace/${{ env.example-path }}
+        idf.py build
+
     
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
