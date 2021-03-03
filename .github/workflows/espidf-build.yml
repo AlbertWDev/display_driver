@@ -11,8 +11,12 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    
     container: espressif/idf:v4.2
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [java]
     
     env:
       component-path: display_driver
@@ -23,19 +27,17 @@ jobs:
       uses: actions/checkout@v2
       with:
         path: ${{ env.component-path }}
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: ${{ matrix.language }}
     
     - name: Build example
       run: |
-        echo "Working directory:"
-        pwd
-        echo "Files:"
-        ls
         . ${IDF_PATH}/export.sh
-        echo "IDF/export.sh finished"
-        cd display_driver/example
-        echo "Moved to example directory"
+        cd ${{ env.example-path }}
         idf.py build
-        echo "Build finished"
 
-    #- name: Perform CodeQL Analysis
-    #  uses: github/codeql-action/analyze@v1
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
