@@ -1,0 +1,30 @@
+name: "Build (ESP-IDF latest)"
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    container:
+      image: espressif/idf:latest
+      env:
+        LANG: en_US.UTF-8
+    
+    env:
+      example-path: example
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    
+    - name: Build example
+      run: |
+        . ${IDF_PATH}/export.sh
+        cd ${{ env.example-path }}
+        idf.py build
