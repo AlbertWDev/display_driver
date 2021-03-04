@@ -19,14 +19,11 @@ jobs:
         language: [cpp]
     
     env:
-      component-path: display_driver
-      example-path: display_driver/example
+      example-path: example
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-      with:
-        path: ${{ env.component-path }}
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
