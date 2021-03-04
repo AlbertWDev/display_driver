@@ -29,8 +29,6 @@ jobs:
         pwd
         echo "Files:"
         ls
-        . ${IDF_PATH}/export.sh
-        echo "IDF_PATH export done"
         cd ${{ env.example-path }}
         echo "Moved to example, working directory:"
         pwd
