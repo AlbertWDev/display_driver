@@ -1,4 +1,4 @@
-name: "ESP-IDF Build"
+name: "Build (ESP-IDF v4.2)"
 
 on:
   push:
@@ -11,7 +11,10 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    container: espressif/idf:v4.2
+    container:
+      image: espressif/idf:v4.2
+      env:
+        LANG: en_US.UTF-8
 
     strategy:
       fail-fast: false
