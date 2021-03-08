@@ -29,14 +29,28 @@ typedef struct __attribute__((__packed__)) color24_t {
 	uint8_t b;
 } color24_t;
 
-
+/* Initialize SPI communication and display according to "display_conf.h"
+ * settings.
+ */
 esp_err_t display_init();
 
+/* Send a 24-bit color buffer to the display on specific coordinates.
+ * 
+ * IMPORTANT: The color buffer should be DMA-capable memory. Otherwise, the
+ * efficiency of the transaction will be affected because the driver would
+ * make a copy of it.
+ */
 esp_err_t display_send_color24(
     uint16_t x1, uint16_t y1,
     uint16_t x2, uint16_t y2,
     color24_t* color, size_t len);
 
+/* Send a 16-bit color buffer to the display on specific coordinates.
+ * 
+ * IMPORTANT: The color buffer should be DMA-capable memory. Otherwise, the
+ * efficiency of the transaction will be affected because the driver would
+ * make a copy of it.
+ */
 esp_err_t display_send_color16(
     uint16_t x1, uint16_t y1,
     uint16_t x2, uint16_t y2,

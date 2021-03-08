@@ -26,20 +26,16 @@ void IRAM_ATTR _display_spi_pre_transfer_cb(spi_transaction_t *t) {
     // TODO: use GPIO.out1_w1tX.val/data for pins [32-34]
 }
 
-
+/* Initialize non-SPI pins
+ */
 esp_err_t _display_pins_init() {
     #if DISP_PIN_BCKL
     gpio_set_direction(DISP_PIN_BCKL, GPIO_MODE_OUTPUT);
     gpio_set_level(DISP_PIN_BCKL, DISP_BCKL_DISABLE);
     #endif
 
-    //gpio_set_direction(DISP_PIN_CLK, GPIO_MODE_OUTPUT);
-    //gpio_set_direction(DISP_PIN_CS, GPIO_MODE_OUTPUT);
     gpio_set_direction(DISP_PIN_DC, GPIO_MODE_OUTPUT);
     gpio_set_level(DISP_PIN_DC, 0);
-    //gpio_set_direction(DISP_PIN_MOSI, GPIO_MODE_OUTPUT);
-    //gpio_set_direction(DISP_PIN_MISO, GPIO_MODE_INPUT);
-    //gpio_set_pull_mode(DISP_PIN_MISO, GPIO_PULLUP_ONLY);
 
     #if DISP_PIN_RST
     gpio_set_direction(DISP_PIN_RST, GPIO_MODE_OUTPUT);
@@ -96,12 +92,14 @@ esp_err_t _display_set_transfer_addrwin(
     static spi_transaction_t t[2];
     memset(t, 0, 2*sizeof(spi_transaction_t));
 
+    // Send column range command (8 bits)
     t[0].length = 8;
     t[0].user = (void*)0;
     t[0].flags = SPI_TRANS_USE_TXDATA;
     t[0].tx_data[0] = DISP_CMD_CASET;    // Column Address Set
     if((ret = spi_device_polling_start(display_handle, &t[0], portMAX_DELAY)) != ESP_OK) return ret;
 
+    // Send column range data (4*8 bits)
     t[1].length = 32;
     t[1].user = (void*)1;
     t[1].flags = SPI_TRANS_USE_TXDATA;
@@ -114,16 +112,12 @@ esp_err_t _display_set_transfer_addrwin(
     if((ret = spi_device_polling_end(display_handle, portMAX_DELAY)) != ESP_OK) return ret;
     if((ret = spi_device_polling_start(display_handle, &t[1], portMAX_DELAY)) != ESP_OK) return ret;
 
-    //t[0].length = 8;
-    //t[0].user = (void*)0;
-    //t[0].flags = SPI_TRANS_USE_TXDATA;
+    // Send row range command (8 bits)
     t[0].tx_data[0] = DISP_CMD_RASET;    // Row Address Set
     if((ret = spi_device_polling_end(display_handle, portMAX_DELAY)) != ESP_OK) return ret;
     if((ret = spi_device_polling_start(display_handle, &t[0], portMAX_DELAY)) != ESP_OK) return ret;
 
-    //t[1].length = 32;
-    //t[1].user = (void*)1;
-    //t[1].flags = SPI_TRANS_USE_TXDATA;
+    // Send row range data (4*8 bits)
     y1 += DISP_Y_OFFSET;
     y2 += DISP_Y_OFFSET;
     t[1].tx_data[0] = y1 >> 8;              // Page Start (High)
@@ -175,7 +169,7 @@ esp_err_t _display_init(spi_device_handle_t display_handle) {
     esp_err_t ret;
 
     // Wait in case previous transactions are still in progress
-    // The polling transaction (addrwin) can NOT be started if there are any other transactions in
+    // The polling transactions can NOT be started if there are any other transactions in
     // progress
     if((ret = _display_send_data_finish(_display_handle)) != ESP_OK) return ret;
 
