@@ -26,14 +26,36 @@ void IRAM_ATTR _display_spi_pre_transfer_cb(spi_transaction_t *t) {
     // TODO: use GPIO.out1_w1tX.val/data for pins [32-34]
 }
 
-/* Initialize non-SPI pins
+esp_err_t _backlight_init() {
+    esp_err_t ret;
+
+    // Configure timer
+    ledc_timer_config_t timer_conf = {
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .duty_resolution = LEDC_TIMER_13_BIT,   // 13 bits: [0, 8191]
+        .timer_num = LEDC_TIMER_0,
+        .freq_hz = 5000,
+        .clk_cfg = LEDC_AUTO_CLK
+    };
+    ret = ledc_timer_config(&timer_conf);
+    if(ret != ESP_OK) return ret;
+
+    // Configure channel
+    ledc_channel_config_t channel_conf = {
+        .gpio_num = DISP_PIN_BCKL,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .channel = LEDC_CHANNEL_0,
+        .timer_sel = LEDC_TIMER_0,
+        .duty = DISP_BCKL_DISABLE * 0x1fff, // 0x1fff = 8191, max for 13-bit resolution
+        .hpoint = 0
+    };
+    return ledc_channel_config(&channel_conf);
+}
+
+/* 
+ * Initialize non-SPI pins
  */
 esp_err_t _display_pins_init() {
-    #if DISP_PIN_BCKL
-    gpio_set_direction(DISP_PIN_BCKL, GPIO_MODE_OUTPUT);
-    gpio_set_level(DISP_PIN_BCKL, DISP_BCKL_DISABLE);
-    #endif
-
     gpio_set_direction(DISP_PIN_DC, GPIO_MODE_OUTPUT);
     gpio_set_level(DISP_PIN_DC, 0);
 
@@ -192,8 +214,10 @@ esp_err_t display_init() {
     esp_err_t ret = ESP_OK;
 
     /// Initialize pins
+    #if DISP_PIN_BCKL
+    _backlight_init();
+    #endif
     _display_pins_init();
-    vTaskDelay(pdMS_TO_TICKS(100));
 
     /// Configure SPI bus
     spi_bus_config_t disp_spi_bus_cfg = {
@@ -205,6 +229,7 @@ esp_err_t display_init() {
         .max_transfer_sz = DISP_SPI_MAX_TRANSFER_SIZE
     };
     ret = spi_bus_initialize(DISP_SPI_HOST, &disp_spi_bus_cfg, 1);
+    if(ret != ESP_OK) return ret;
 
     /// Attach display device
     spi_device_interface_config_t disp_spi_dev_cfg = {
@@ -215,12 +240,14 @@ esp_err_t display_init() {
         .pre_cb =_display_spi_pre_transfer_cb   // Pre-transfer callback to handle D/C line
     };
     ret = spi_bus_add_device(DISP_SPI_HOST, &disp_spi_dev_cfg, &_display_handle);
+    if(ret != ESP_OK) return ret;
 
     /// Initialize display with commands sequence
     ret = _display_init(_display_handle);
+    if(ret != ESP_OK) return ret;
 
     #if DISP_PIN_BCKL
-    gpio_set_level(DISP_PIN_BCKL, DISP_BCKL_ENABLE);
+    ret = display_set_backlight(100);
     #endif
 
     return ret;
@@ -270,4 +297,14 @@ esp_err_t display_send_color16(
 
 esp_err_t display_sync() {
     return _display_send_data_finish(_display_handle);
+}
+
+esp_err_t display_set_backlight(uint8_t value) {
+    esp_err_t ret;
+
+    uint32_t duty = ((value <= 100 ? value : 100) * 0x1fff) / 100;
+    ret = ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, DISP_BCKL_ENABLE ? duty : 0x1fff - duty);
+    if(ret != ESP_OK) return ret;
+
+    return ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
 }
