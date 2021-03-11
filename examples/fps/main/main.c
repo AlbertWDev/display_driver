@@ -6,7 +6,7 @@
 #include "display_driver.h"
 
 #include "esp_log.h"
-static const char* TAG = "MAIN";
+static const char* TAG = "EXAMPLE-FPS";
 
 #define BUFFER_SIZE DISP_WIDTH * DISP_HEIGHT
 
@@ -18,7 +18,7 @@ static const char* TAG = "MAIN";
     #define display_send_color display_send_color24
 #endif
 
-int64_t elapsed;
+static int64_t elapsed;
 
 void fps_task(void *pvParameter)
 {
@@ -43,7 +43,10 @@ void app_main()
     while(1) {
         uint64_t start = esp_timer_get_time();
 
+        // Fill buffer with black or white alternatively
         memset(buf, (i++ % 2) ? 0xFF : 0x00, BUFFER_SIZE * sizeof(color_t));
+
+        // Push buffer to display
         if(display_send_color(0, 0, DISP_WIDTH-1, DISP_HEIGHT-1, buf, BUFFER_SIZE) != ESP_OK) {
             ESP_LOGE(TAG, "Unable to send data to display\n");
             return;
