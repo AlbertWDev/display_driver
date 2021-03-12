@@ -8,8 +8,8 @@
 #include "esp_log.h"
 static const char* TAG = "EXAMPLE-BCKL";
 
-#define BCKL_COUNT 6
-static const uint8_t bckl_levels[BCKL_COUNT] = {0, 20, 40, 60, 80, 100};
+#define BCKL_COUNT 7
+static const uint8_t bckl_levels[BCKL_COUNT] = {0, 16, 33, 50, 66, 83, 100};
 
 
 #define BUFFER_SIZE DISP_WIDTH * DISP_HEIGHT
@@ -17,12 +17,12 @@ static const uint8_t bckl_levels[BCKL_COUNT] = {0, 20, 40, 60, 80, 100};
 #if DISP_DEPTH == 16
     typedef color16_t color_t;
     static color_t WHITE = 0xFFFF;
-    static color_t GRAY = 0x8888;
+    static color_t GRAY = 0x2842;
     #define display_send_color display_send_color16
 #elif DISP_DEPTH == 18
     typedef color24_t color_t;
     static color_t WHITE = {.r = 0xFF, .g = 0xFF, .b = 0xFF};
-    static color_t GRAY = {.r = 0x7F, .g = 0x7F, .b = 0x7F};
+    static color_t GRAY = {.r = 0x47, .g = 0x47, .b = 0x47};
     #define display_send_color display_send_color24
 #endif
 
@@ -50,17 +50,18 @@ void draw_rect(color_t* buf, color_t color, int16_t x, int16_t y, int16_t w, int
 }
 
 /* 
- * Draw the backlight level indicator
+ * Draw the backlight level indicator.
+ * First level is assumed to be 0 and not drawn.
  */
 void draw_backlight_level(color_t* buf, uint8_t level) {
     static const uint8_t padding = 4;
-    uint8_t indicator_width = DISP_WIDTH - (BCKL_COUNT + 1) * padding;
+    uint8_t indicator_width = (DISP_WIDTH - BCKL_COUNT * padding) / BCKL_COUNT;
 
     color_t color;
-    for(uint8_t i = 0; i < BCKL_COUNT; i++) {
+    for(uint8_t i = 1; i < BCKL_COUNT; i++) {
         color = (bckl_levels[i] <= level) ? WHITE : GRAY;
         draw_rect(buf, color,
-            padding + i * (indicator_width + padding), 5,
+            padding + (i-1) * (indicator_width + padding), 5,
             indicator_width, 20);
     }
 }
