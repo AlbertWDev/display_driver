@@ -4,6 +4,7 @@
 #include "esp_log.h"
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
+#include "driver/ledc.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <string.h>
@@ -57,3 +58,9 @@ esp_err_t display_send_color16(
     color16_t* color, size_t len);
 
 esp_err_t display_sync();
+
+/* Set backlight intensity level.
+ * 
+ *  @param value Backlight intensity as a percentage [0-100]
+ */
+esp_err_t display_set_backlight(uint8_t value);
