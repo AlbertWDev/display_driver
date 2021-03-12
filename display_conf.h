@@ -39,5 +39,6 @@
     #define DISP_PIN_RST    16
     #define DISP_PIN_BCKL   17
 
-    #define DISP_SPI_CLOCK_SPEED 40000000
+    // According to datasheet, minimum clock cycle for write operations is 66 ns (~ 15 MHz)
+    #define DISP_SPI_CLOCK_SPEED 15000000
 #endif
