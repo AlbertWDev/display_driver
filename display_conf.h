@@ -1,62 +1,47 @@
 #pragma once
 
-#define DISPLAY_DEVICE_ST7735   1
-#define DISPLAY_DEVICE_ILI9341  2
-#define DISPLAY_DEVICE_ILI9342C 3
+#include "sdkconfig.h"
+
+#define DISPLAY_DRIVER_ST7735   1
+#define DISPLAY_DRIVER_ILI9341  2
+#define DISPLAY_DRIVER_ILI9342C 3
 
 
-#define DISPLAY_DEVICE_TYPE DISPLAY_DEVICE_ST7735
+#if defined(CONFIG_DISPLAY_DRIVER_ST7735)
+    #define DISPLAY_DRIVER DISPLAY_DRIVER_ST7735
 
-#if DISPLAY_DEVICE_TYPE == DISPLAY_DEVICE_ILI9341
-    #define DISP_WIDTH  240
-    #define DISP_HEIGHT 320
-    #define DISP_DEPTH  16
+#elif defined(CONFIG_DISPLAY_DRIVER_ILI9341)
+    #define DISPLAY_DRIVER DISPLAY_DRIVER_ILI9341
 
-    #define DISP_SPI_HOST   VSPI_HOST
-    #define DISP_SPI_MAX_TRANSFER_SIZE  DISP_WIDTH * DISP_HEIGHT * 2 + 8
-    #define DISP_TRANSACTION_QUEUE_SIZE 7
-    #define DISP_PIN_CLK    18
-    #define DISP_PIN_MISO   19
-    #define DISP_PIN_MOSI   23
-    #define DISP_PIN_CS     14
-    #define DISP_PIN_DC     27
-    #define DISP_PIN_RST    33
-    #define DISP_PIN_BCKL   32
+#elif defined(CONFIG_DISPLAY_DRIVER_ILI9342C)
+    #define DISPLAY_DRIVER DISPLAY_DRIVER_ILI9342C
 
-    #define DISP_SPI_CLOCK_SPEED 40000000
-#elif DISPLAY_DEVICE_TYPE == DISPLAY_DEVICE_ST7735
-    #define DISP_WIDTH  128
-    #define DISP_HEIGHT 160
-    #define DISP_DEPTH  16
-
-    #define DISP_SPI_HOST   VSPI_HOST
-    #define DISP_SPI_MAX_TRANSFER_SIZE  DISP_WIDTH * DISP_HEIGHT * 2 + 8
-    #define DISP_TRANSACTION_QUEUE_SIZE 7
-    #define DISP_PIN_CLK    18
-    #define DISP_PIN_MISO   19
-    #define DISP_PIN_MOSI   23
-    #define DISP_PIN_CS     5
-    #define DISP_PIN_DC     4
-    #define DISP_PIN_RST    16
-    #define DISP_PIN_BCKL   17
-
-    // According to datasheet, minimum clock cycle for write operations is 66 ns (~ 15 MHz)
-    #define DISP_SPI_CLOCK_SPEED 15000000
-#elif DISPLAY_DEVICE_TYPE == DISPLAY_DEVICE_ILI9342C
-    #define DISP_WIDTH  320
-    #define DISP_HEIGHT 240
-    #define DISP_DEPTH  16
-
-    #define DISP_SPI_HOST   VSPI_HOST
-    #define DISP_SPI_MAX_TRANSFER_SIZE  DISP_WIDTH * DISP_HEIGHT * 2 + 8
-    #define DISP_TRANSACTION_QUEUE_SIZE 7
-    #define DISP_PIN_CLK    18
-    #define DISP_PIN_MISO   38
-    #define DISP_PIN_MOSI   23
-    #define DISP_PIN_CS     5
-    #define DISP_PIN_DC     15
-    #define DISP_PIN_RST    -1
-    #define DISP_PIN_BCKL   -1
-
-    #define DISP_SPI_CLOCK_SPEED 40000000
+#else
+    #error "Display driver type not set"
 #endif
+
+
+#define DISP_WIDTH  CONFIG_DISPLAY_WIDTH
+#define DISP_HEIGHT CONFIG_DISPLAY_HEIGHT
+#define DISP_DEPTH  CONFIG_DISPLAY_DEPTH
+
+
+#if defined(CONFIG_DISPLAY_SPI_HOST_VSPI)
+    #define DISP_SPI_HOST   VSPI_HOST
+#elif defined(CONFIG_DISPLAY_SPI_HOST_HSPI)
+    #define DISP_SPI_HOST   HSPI_HOST
+#else
+    #error "Display SPI host not set"
+#endif
+
+#define DISP_SPI_MAX_TRANSFER_SIZE  CONFIG_DISPLAY_SPI_MAX_TRANSFER_SIZE
+#define DISP_SPI_QUEUE_SIZE         CONFIG_DISPLAY_SPI_QUEUE_SIZE
+#define DISP_SPI_CLOCK_SPEED        CONFIG_DISPLAY_SPI_CLOCK_SPEED
+
+#define DISP_PIN_MISO   CONFIG_DISPLAY_PIN_MISO
+#define DISP_PIN_MOSI   CONFIG_DISPLAY_PIN_MOSI
+#define DISP_PIN_CLK    CONFIG_DISPLAY_PIN_CLK
+#define DISP_PIN_CS     CONFIG_DISPLAY_PIN_CS
+#define DISP_PIN_DC     CONFIG_DISPLAY_PIN_DC
+#define DISP_PIN_RST    CONFIG_DISPLAY_PIN_RST
+#define DISP_PIN_BCKL   CONFIG_DISPLAY_PIN_BCKL

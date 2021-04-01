@@ -1,0 +1,130 @@
+menu "Display Driver"
+
+    choice
+        prompt "Display driver"
+        help
+            Driver used to communicate with the display
+
+        config DISPLAY_DRIVER_ST7735
+            bool "ST7735"
+
+        config DISPLAY_DRIVER_ILI9341
+            bool "ILI9341"
+        
+        config DISPLAY_DRIVER_ILI9342C
+            bool "ILI9342C"
+        
+    endchoice
+
+    config DISPLAY_WIDTH
+        int "Display width"
+        default 128 if DISPLAY_DRIVER_ST7735
+        default 240 if DISPLAY_DRIVER_ILI9341 
+        default 320 if DISPLAY_DRIVER_ILI9342C
+        help
+            Screen width in pixels
+    
+    config DISPLAY_HEIGHT
+        int "Display height"
+        default 160 if DISPLAY_DRIVER_ST7735
+        default 320 if DISPLAY_DRIVER_ILI9341 
+        default 240 if DISPLAY_DRIVER_ILI9342C
+        help
+            Screen height in pixels
+
+    choice
+        bool "Display depth"
+        default DISPLAY_DEPTH_16BIT
+        help
+            Color depth in bits.
+
+            16-bit color uses 2 bytes per pixel (rrrrrggg, gggbbbbb)
+
+            18-bit color uses 3 bytes per pixel (rrrrrr--, gggggg--, bbbbbb--)
+
+        config DISPLAY_DEPTH_16BIT
+            bool "16 bits (RGB565)"
+        config DISPLAY_DEPTH_18BIT
+            bool "18 bits (RGB666)"
+    endchoice
+    
+    config DISPLAY_DEPTH
+        int
+        default 16
+        default 16 if DISPLAY_DEPTH_16BIT
+        default 18 if DISPLAY_DEPTH_18BIT
+    
+    menu "SPI"
+
+        choice
+            bool "SPI host"
+            default DISPLAY_SPI_HOST_VSPI
+            help
+                SPI host used by the display driver
+
+            config DISPLAY_SPI_HOST_VSPI
+                bool "VSPI"
+
+            config DISPLAY_SPI_HOST_HSPI
+                bool "HSPI"
+
+        endchoice
+
+        config DISPLAY_SPI_CLOCK_SPEED
+            int "SPI clock speed"
+            help
+                If reading is required, the recommended maximum is 26.7MHz.
+            default 40000000
+            default 15000000 if DISPLAY_DRIVER_ST7735
+
+        config DISPLAY_PIN_CLK
+            int "Clock GPIO pin"
+            range 0 45
+            default 18
+
+        config DISPLAY_PIN_MISO
+            int "MISO GPIO pin"
+            range -1 46
+            default 19
+
+        config DISPLAY_PIN_MOSI
+            int "MOSI GPIO pin"
+            range 0 45
+            default 23
+
+        config DISPLAY_PIN_CS
+            int "Chip Select (CS) GPIO pin"
+            range -1 45
+            default 5
+
+        config DISPLAY_PIN_DC
+            int "Data/Command (DC) GPIO pin"
+            range 0 45
+            default 4
+
+        config DISPLAY_PIN_RST
+            int "Reset GPIO pin"
+            range -1 45
+            default 16
+
+        config DISPLAY_PIN_BCKL
+            int "Backlight GPIO pin"
+            range -1 45
+            default 17
+
+        config DISPLAY_SPI_MAX_TRANSFER_SIZE
+            int "Maximum SPI transfer size"
+            help
+                Maximum SPI transfer size, in bytes.
+            default 153600
+            default 40960 if DISPLAY_DRIVER_ST7735
+            default 153600 if DISPLAY_DRIVER_ILI9341
+            default 153600 if DISPLAY_DRIVER_ILI9342C
+
+        config DISPLAY_SPI_QUEUE_SIZE
+            int "SPI transaction queue size"
+            help
+                Maximum number of transactions that can be queued at the same time.
+            default 2
+    endmenu
+endmenu

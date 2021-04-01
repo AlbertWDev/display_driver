@@ -7,13 +7,13 @@ static spi_device_handle_t _display_handle;
 static uint32_t _display_pending_transactions = 0;
 
 
-#if (DISPLAY_DEVICE_TYPE == DISPLAY_DEVICE_ILI9341)
+#if (DISPLAY_DRIVER == DISPLAY_DRIVER_ILI9341)
     #include "devices/ili9341.h"
     const _display_init_cmd_t* _display_init_sequence = _display_init_ILI9341;
-#elif (DISPLAY_DEVICE_TYPE == DISPLAY_DEVICE_ST7735)
+#elif (DISPLAY_DRIVER == DISPLAY_DRIVER_ST7735)
     #include "devices/st7735.h"
     const _display_init_cmd_t* _display_init_sequence = _display_init_ST7735;
-#elif (DISPLAY_DEVICE_TYPE == DISPLAY_DEVICE_ILI9342C)
+#elif (DISPLAY_DRIVER == DISPLAY_DRIVER_ILI9342C)
     #include "devices/ili9342c.h"
     const _display_init_cmd_t* _display_init_sequence = _display_init_ILI9342C;
 #endif
@@ -244,7 +244,7 @@ esp_err_t display_init() {
         .clock_speed_hz = DISP_SPI_CLOCK_SPEED,
         .mode = 0,
         .spics_io_num = DISP_PIN_CS,
-        .queue_size = DISP_TRANSACTION_QUEUE_SIZE,
+        .queue_size = DISP_SPI_QUEUE_SIZE,
         .flags = SPI_DEVICE_NO_DUMMY | SPI_DEVICE_HALFDUPLEX,
         .pre_cb =_display_spi_pre_transfer_cb   // Pre-transfer callback to handle D/C line
     };
