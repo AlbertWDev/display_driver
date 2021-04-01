@@ -55,7 +55,7 @@ void draw_rect(color_t* buf, color_t color, int16_t x, int16_t y, int16_t w, int
  */
 void draw_backlight_level(color_t* buf, uint8_t level) {
     static const uint8_t padding = 4;
-    uint8_t indicator_width = (DISP_WIDTH - BCKL_COUNT * padding) / BCKL_COUNT;
+    uint8_t indicator_width = (DISP_WIDTH - BCKL_COUNT * padding) / (BCKL_COUNT - 1);
 
     color_t color;
     for(uint8_t i = 1; i < BCKL_COUNT; i++) {
@@ -68,13 +68,13 @@ void draw_backlight_level(color_t* buf, uint8_t level) {
 
 void app_main()
 {
-    uint8_t bckl_index = 0;
-    int8_t change_direction = 1;
-
     if(display_init() != ESP_OK) {
         ESP_LOGE(TAG, "Unable to initialize display\n");
         return;
     }
+
+    uint8_t bckl_index = 0;
+    int8_t change_direction = 1;
 
     color_t* buf = heap_caps_malloc(BUFFER_SIZE * sizeof(color_t), MALLOC_CAP_DMA);
 
