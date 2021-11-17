@@ -7,6 +7,9 @@ menu "Display Driver"
 
         config DISPLAY_DRIVER_ST7735
             bool "ST7735"
+        
+        config DISPLAY_DRIVER_ST7789VW
+            bool "ST7789VW"
 
         config DISPLAY_DRIVER_ILI9341
             bool "ILI9341"
@@ -19,6 +22,7 @@ menu "Display Driver"
     config DISPLAY_WIDTH
         int "Display width"
         default 128 if DISPLAY_DRIVER_ST7735
+        default 240 if DISPLAY_DRIVER_ST7789VW
         default 240 if DISPLAY_DRIVER_ILI9341 
         default 320 if DISPLAY_DRIVER_ILI9342C
         help
@@ -27,6 +31,7 @@ menu "Display Driver"
     config DISPLAY_HEIGHT
         int "Display height"
         default 160 if DISPLAY_DRIVER_ST7735
+        default 320 if DISPLAY_DRIVER_ST7789VW
         default 320 if DISPLAY_DRIVER_ILI9341 
         default 240 if DISPLAY_DRIVER_ILI9342C
         help

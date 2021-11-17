@@ -3,8 +3,8 @@
 #include "esp_system.h"
 #include "display_conf.h"
 
-#define DISP_X_OFFSET 2
-#define DISP_Y_OFFSET 1
+#define DISP_X_OFFSET 0
+#define DISP_Y_OFFSET 0
 
 
 #define DISP_BCKL_ENABLE    1
@@ -95,32 +95,57 @@
 #define DISP_CMD_IDMON      0x39
 // Interface pixel format
 #define DISP_CMD_COLMOD     0x3A
-    /// 12-bit/pixel Color Format
-    #define COLMOD_12BIT    0x33
-    /// 16-bit/pixel Color Format
-    #define COLMOD_16BIT    0x55
-    /// 18-bit/pixel Color Format
-    #define COLMOD_18BIT    0x66
-// Read ID1
-#define DISP_CMD_RDID1      0xDA
-// Read ID2
-#define DISP_CMD_RDID2      0xDB
-// Read ID3
-#define DISP_CMD_RDID3      0xDC
+    /// 65K RGB Interface Color Format
+    #define COLMOD_65K      0x50
+    /// 262K RGB Interface Color Format
+    #define COLMOD_262K     0x60
+    /// 12-bit/pixel Control Interface Color Format
+    #define COLMOD_12BIT    0x03
+    /// 16-bit/pixel Control Interface Color Format
+    #define COLMOD_16BIT    0x05
+    /// 18-bit/pixel Control Interface Color Format
+    #define COLMOD_18BIT    0x06
+// Porch Setting
+#define DISP_CMD_PORCTRL    0xB2
+// Gate Control
+#define DISP_CMD_GCTRL      0xB7
+// VCOM Setting
+#define DISP_CMD_VCOMS      0xBB
+// LCM Control
+#define DISP_CMD_LCMCTRL    0xC0
+// VDV and VRH Command Enable
+#define DISP_CMD_VDVVRHEN   0xC2
+// VRH Set
+#define DISP_CMD_VRHS       0xC3
+// VDV Set
+#define DISP_CMD_VDVS       0xC4
+// Frame Rate Control in Normal Mode
+#define DISP_CMD_FRCTRL2    0xC6
+// Power Control 1
+#define DISP_CMD_PWCTRL1    0xD0
 
 
-
-DRAM_ATTR static const _display_init_cmd_t _display_init_ST7735[] = {
+DRAM_ATTR static const _display_init_cmd_t _display_init_ST7789VW[] = {
 #if DISP_PIN_RST <= 0
     // Software reset if hardware reset wasn't possible (RST pin not connected to board)
     {DISP_CMD_SWRESET, {0}, 3<<5},  // 150ms delay (120ms required)
 #endif
-    {DISP_CMD_MADCTL, {MADCTL_MX|MADCTL_MY}, 1},
+    //{DISP_CMD_MADCTL, {MADCTL_MX|MADCTL_MY}, 1},
+    {DISP_CMD_MADCTL, {MADCTL_MY|MADCTL_MX}, 1},
 #if DISP_DEPTH == 16
     {DISP_CMD_COLMOD, {COLMOD_16BIT}, 1},
 #elif DISP_DEPTH == 18
     {DISP_CMD_COLMOD, {COLMOD_18BIT}, 1},
 #endif
+    //{DISP_CMD_PORCTRL, {0x0C, 0x0C, 0x00, 0x33, 0x33}, 5},
+    //{DISP_CMD_GCTRL, {0x35}, 1},
+    //{DISP_CMD_VCOMS, {0x1F}, 1},
+    //{DISP_CMD_LCMCTRL, {0x2C}, 1},
+	//{DISP_CMD_VDVVRHEN, {0x01}, 1},
+	//{DISP_CMD_VRHS, {0x12}, 1},
+	//{DISP_CMD_VDVS, {0x20}, 1},
+	//{DISP_CMD_FRCTRL2, {0x0F}, 1},
+	//{DISP_CMD_PWCTRL1, {0xA4, 0xA1}, 2},
     {DISP_CMD_SLPOUT, {0}, 3<<5},   // 150ms delay (120ms required)
     {DISP_CMD_DISPON, {0}, 3<<5},   // 150ms delay (120ms required before DISPOFF)
     {DISP_CMD_NOP, {0}, 0xFF}

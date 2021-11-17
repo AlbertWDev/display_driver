@@ -3,8 +3,6 @@ name: "Build (ESP-IDF v4.2)"
 on:
   push:
     branches: [ master ]
-    paths-ignore:
-      - '**.md'
   pull_request:
     branches: [ master ]
     paths-ignore:

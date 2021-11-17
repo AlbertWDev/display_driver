@@ -10,6 +10,9 @@ static uint32_t _display_pending_transactions = 0;
 #if (DISPLAY_DRIVER == DISPLAY_DRIVER_ILI9341)
     #include "devices/ili9341.h"
     const _display_init_cmd_t* _display_init_sequence = _display_init_ILI9341;
+#elif (DISPLAY_DRIVER == DISPLAY_DRIVER_ST7789VW)
+    #include "devices/st7789vw.h"
+    const _display_init_cmd_t* _display_init_sequence = _display_init_ST7789VW;
 #elif (DISPLAY_DRIVER == DISPLAY_DRIVER_ST7735)
     #include "devices/st7735.h"
     const _display_init_cmd_t* _display_init_sequence = _display_init_ST7735;

@@ -132,4 +132,3 @@ DRAM_ATTR static const _display_init_cmd_t _display_init_ILI9341[] = {
     {DISP_CMD_DISPON, {0}, 3<<5},    // Display on; 150 ms delay
     {DISP_CMD_NOP, {0}, 0xFF}
 };
-
